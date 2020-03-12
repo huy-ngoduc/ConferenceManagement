@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.2-develop.2470" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Conference.Common\Conference.Common.csproj" />
+      <ProjectReference Include="..\..\Registration\Registration.Contracts\Registration.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>
