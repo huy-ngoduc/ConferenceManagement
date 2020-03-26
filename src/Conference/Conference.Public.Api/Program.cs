@@ -22,7 +22,7 @@ namespace Conference.Public.Api
                 var provider = scope.ServiceProvider;
                 try
                 {
-                    await provider.GetRequiredService<ConferenceRegistrationDbContext>().Database.EnsureCreatedAsync();
+                    await provider.GetRequiredService<Func<ConferenceRegistrationDbContext>>().Invoke().Database.EnsureCreatedAsync();
                 }
                 catch (Exception e)
                 {

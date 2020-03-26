@@ -19,8 +19,6 @@
       <ProjectReference Include="..\..\Conference.Common\Conference.Common.csproj" />
       <ProjectReference Include="..\..\Conference.Public.Share\Conference.Public.Share.csproj" />
       <ProjectReference Include="..\..\ConferenceManagement\Conference.Contracts\Conference.Contracts.csproj" />
-      <ProjectReference Include="..\..\Payments\PaymentsContracts\PaymentsContracts.csproj" />
-      <ProjectReference Include="..\Registration.Contracts\Registration.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>

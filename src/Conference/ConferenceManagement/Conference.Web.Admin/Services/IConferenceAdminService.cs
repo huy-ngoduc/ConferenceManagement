@@ -9,7 +9,7 @@ namespace Conference.Web.Admin.Services
         Task<ConferenceReadModel> Get(string slug, string accessCode);
         Task<bool> Publish(string slug, string accessCode);
         Task<bool> UnPublish(string slug, string accessCode);
-        Task<ValueTuple<string, string>> Locate(string email, string accessCode);
+        Task<ConferenceIdentity> Locate(string email, string accessCode);
         Task<string> CreateConference(ConferenceCreateInputModel inputModel);
     }
 }

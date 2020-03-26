@@ -26,8 +26,8 @@ namespace Conference.Admin.Api.Controllers
 
         #region Conference Details
 
-        [HttpGet("{slug}/{accessCode}")]
-        public async Task<IActionResult> Get(string slug, string accessCode)
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> Get(string slug, [FromHeader]string accessCode)
         {
             var conference = await _service.FindConference(slug);
             if (conference == null)
@@ -44,8 +44,8 @@ namespace Conference.Admin.Api.Controllers
             return Ok(_mapper.Map<ConferenceReadModel>(conference));
         }
         
-        [HttpGet("locate/{email}/{accessCode}")]
-        public async Task<IActionResult> Locate(string email, string accessCode)
+        [HttpGet("locate/{email}")]
+        public async Task<IActionResult> Locate(string email, [FromHeader]string accessCode)
         {
             var conference = await this._service.FindConference(email, accessCode);
             if (conference == null)
@@ -53,7 +53,7 @@ namespace Conference.Admin.Api.Controllers
                 return NotFound("Could not locate a conference with the provided email and access code.");
             }
 
-            return Ok(new {slug = conference.Slug, conference.AccessCode});
+            return Ok(new ConferenceIdentity{Slug = conference.Slug, AccessCode = conference.AccessCode});
         }
 
         [HttpPost]
@@ -108,17 +108,22 @@ namespace Conference.Admin.Api.Controllers
 
         [HttpPut]
         [Microsoft.AspNetCore.Mvc.Route("publish")]
-        public async Task<IActionResult> Publish([FromBody] PublishInputModel inputModel)
+        public async Task<IActionResult> Publish(ConferenceIdentity identity)
         {
-            var conference = await this._service.FindConference(inputModel.Slug);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var conference = await this._service.FindConference(identity.Slug);
             if (conference == null)
             {
                 return NotFound();
             }
 
             // check access
-            if (inputModel.AccessCode == null ||
-                !string.Equals(inputModel.AccessCode, conference.AccessCode, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(identity.AccessCode) ||
+                !string.Equals(identity.AccessCode, conference.AccessCode, StringComparison.Ordinal))
             {
                 return Unauthorized("Invalid access code.");
             }
@@ -129,18 +134,23 @@ namespace Conference.Admin.Api.Controllers
         }
 
         [HttpPut]
-        [Microsoft.AspNetCore.Mvc.Route("unpublish")]
-        public async Task<IActionResult> Unpublish([FromBody] PublishInputModel inputModel)
+        [Microsoft.AspNetCore.Mvc.Route("unpublish/")]
+        public async Task<IActionResult> Unpublish(ConferenceIdentity identity)
         {
-            var conference = await this._service.FindConference(inputModel.Slug);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var conference = await this._service.FindConference(identity.Slug);
             if (conference == null)
             {
                 return NotFound();
             }
 
             // check access
-            if (inputModel.AccessCode == null ||
-                !string.Equals(inputModel.AccessCode, conference.AccessCode, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(identity.AccessCode) ||
+                !string.Equals(identity.AccessCode, conference.AccessCode, StringComparison.Ordinal))
             {
                 return Unauthorized("Invalid access code.");
             }

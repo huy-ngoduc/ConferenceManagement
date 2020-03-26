@@ -18,12 +18,12 @@ namespace Conference.Public.Api.Controllers
             this.conferenceDao = conferenceDao;
         }
 
-        [HttpGet("/published")]
+        [HttpGet("published")]
         public async Task<IActionResult> GetPublishedConferences()
         {
             return Ok(await conferenceDao.GetPublishedConferences());
         }
-        [HttpGet("{conferenceCode}")]
+        [HttpGet("details/{conferenceCode}")]
         public async Task<IActionResult> GetConferenceDetails(string conferenceCode)
         {
             return Ok(await conferenceDao.GetConferenceDetails(conferenceCode));

@@ -17,8 +17,9 @@ namespace Conference.Web.Admin.Services
 
         public async Task<ConferenceReadModel> Get(string slug, string accessCode)
         {
+            client.DefaultRequestHeaders.Add("accessCode", accessCode);
             return await JsonSerializer.DeserializeAsync<ConferenceReadModel>(
-                await client.GetStreamAsync($"api/conference/?slug={slug}&accessCode={accessCode}"),
+                await client.GetStreamAsync($"conference/{slug}"),
                 new JsonSerializerOptions() {PropertyNameCaseInsensitive = true});
         }
 
@@ -26,24 +27,26 @@ namespace Conference.Web.Admin.Services
         {
             var modelJson =
                 new StringContent(
-                    JsonSerializer.Serialize(new PublishInputModel() {Slug = slug, AccessCode = accessCode}),
+                    JsonSerializer.Serialize(new ConferenceIdentity { AccessCode = accessCode, Slug = slug}),
                     Encoding.UTF8, "application/json");
-            return (await client.PutAsync($"api/conference/publish", modelJson)).IsSuccessStatusCode;
+            var response = await client.PutAsync($"conference/publish", modelJson);
+            return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> UnPublish(string slug, string accessCode)
         {
             var modelJson =
                 new StringContent(
-                    JsonSerializer.Serialize(new PublishInputModel() {Slug = slug, AccessCode = accessCode}),
+                    JsonSerializer.Serialize(new ConferenceIdentity { AccessCode = accessCode, Slug = slug }),
                     Encoding.UTF8, "application/json");
-            return (await client.PutAsync($"api/conference/unpublish", modelJson)).IsSuccessStatusCode;
+            return (await client.PutAsync($"conference/unpublish", modelJson)).IsSuccessStatusCode;
         }
 
-        public async Task<(string, string)> Locate(string email, string accessCode)
+        public async Task<ConferenceIdentity> Locate(string email, string accessCode)
         {
-            return await JsonSerializer.DeserializeAsync<(string, string)>(
-                await client.GetStreamAsync($"api/conference/?slug={email}&accessCode={accessCode}"),
+            client.DefaultRequestHeaders.Add("accessCode", accessCode);
+            return await JsonSerializer.DeserializeAsync<ConferenceIdentity>(
+                await client.GetStreamAsync($"conference/locate/{email}"),
                 new JsonSerializerOptions() {PropertyNameCaseInsensitive = true});
         }
 
@@ -53,7 +56,7 @@ namespace Conference.Web.Admin.Services
                 new StringContent(
                     JsonSerializer.Serialize(inputModel),
                     Encoding.UTF8, "application/json");
-            var responseMessage = await client.PostAsync($"api/conference/create", modelJson);
+            var responseMessage = await client.PostAsync($"conference", modelJson);
 
             if (responseMessage.IsSuccessStatusCode)
             {

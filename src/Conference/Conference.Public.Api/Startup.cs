@@ -32,11 +32,7 @@ namespace Conference.Public.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<ConferenceRegistrationDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("ConferenceReadDbContext"));
-            });
-
+            
             services.AddMemoryCache();
             services.AddCors(options =>
                 options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader()));
@@ -48,12 +44,16 @@ namespace Conference.Public.Api
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
                 });
 
-            services.AddSingleton<IConferenceDao, CachingConferenceDao>(provider =>
-            {
-                var conferenceDao =
-                    new ConferenceDao(provider.GetRequiredService<ConferenceRegistrationDbContext>);
-                return new CachingConferenceDao(conferenceDao, provider.GetRequiredService<IMemoryCache>());
+
+            services.AddSingleton<Func<ConferenceRegistrationDbContext>>(x => () => {
+                var optionsBuilder = new DbContextOptionsBuilder();
+                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("ConferenceReadDbContext"));
+
+                return new ConferenceRegistrationDbContext(optionsBuilder.Options);
             });
+
+
+            services.AddSingleton<IConferenceDao, CachingConferenceDao>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,9 +68,8 @@ namespace Conference.Public.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseCors("Open");
-            
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }

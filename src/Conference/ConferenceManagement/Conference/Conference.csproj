@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Conference.Common\Conference.Common.csproj" />
-      <ProjectReference Include="..\..\Registration\Registration.Contracts\Registration.Contracts.csproj" />
       <ProjectReference Include="..\Conference.Contracts\Conference.Contracts.csproj" />
     </ItemGroup>
 

@@ -16,8 +16,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ConferenceManagement\Conference\Conference.csproj" />
-      <ProjectReference Include="..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
-      <ProjectReference Include="..\Payments\Payments\Payments.csproj" />
       <ProjectReference Include="..\Registration\Registration\Registration.csproj" />
     </ItemGroup>
 

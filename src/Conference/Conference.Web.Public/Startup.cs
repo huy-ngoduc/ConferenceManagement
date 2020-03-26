@@ -23,10 +23,6 @@ namespace Conference.Web.Public
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ConferenceRegistrationDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("ReadDbContext"));
-            });
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient<ConferenceService>(client =>

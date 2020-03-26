@@ -9,7 +9,7 @@ namespace Conference.Web.Public.Pages
     {
         [Parameter] public string ConferenceCode { get; set; }
         [Inject] public ConferenceService ConferenceService { get; set; }
-        public Registration.ReadModel.ConferenceDetails Conference { get; set; }
+        public Registration.ReadModel.ConferenceDetails Conference { get; set; } = new Registration.ReadModel.ConferenceDetails();
 
         protected override async Task OnInitializedAsync()
         {

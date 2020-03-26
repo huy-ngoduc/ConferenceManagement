@@ -15,12 +15,6 @@
         <label type="text" class="form-control-plaintext">@Conference.OwnerEmail</label>
     </div>
 </div>
-<div class="form-group">
-    <label class="col-4 col-form-label">Access code: </label>
-    <div class="col-8">
-        <label type="text" class="form-control-plaintext">@Conference.AccessCode</label>
-    </div>
-</div>
 
 <h3>Conference information</h3>
 <hr>
@@ -72,17 +66,17 @@
         <label type="text" class="form-control-plaintext">@Conference.EndDate.ToString("yyyy/MM/dd")</label>
     </div>
 </div>
-@if (string.IsNullOrEmpty(Message))
-{
+
     <span class="@(HasError ? "alert-danger" : "alert-success")">@Message</span>
-}
 
-<a href="@($"conference/edit/{Conference.Slug}")" class="btn btn-primary table-btn">
+<br />
+
+@*<a href="@($"conference/edit/{Conference.Slug}")" class="btn btn-primary table-btn">
     <i class="fas fa-edit"></i>Edit
-</a>
+</a>*@
 
-<button type="submit" @onclick="@(e => @Conference.IsPublished ? UnPublish() : Publish())" class="btn btn-primary edit-btn float-right">@(@Conference.IsPublished ? "UnPublish" : "Publish")</button>
+<button type="submit" @onclick="@HandlePublishEvent" class="btn btn-primary edit-btn">@PublishButtonText</button>
 
-<a href="@($"conference/seats/{Conference.Slug}")" class="btn btn-primary table-btn">
+@*<a href="@($"conference/seats/{Conference.Slug}")" class="btn btn-primary table-btn">
     <i class="fas fa-edit"></i>Configure seats
-</a>
+</a>*@

@@ -37,10 +37,20 @@ namespace CommandProcessorWorker
                 {
                     services.Configure<AppConfig>(hostContext.Configuration.GetSection("AppConfig"));
                     
-                    services.AddDbContext<ConferenceContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConferenceContext")));
+                    //services.AddDbContext<ConferenceContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConferenceContext")));
+
+                    services.AddSingleton<Func<ConferenceRegistrationDbContext>>(x => () =>
+                    {
+                        var optionsBuilder = new DbContextOptionsBuilder<ConferenceRegistrationDbContext>();
+                        optionsBuilder.UseSqlServer(hostContext.Configuration.GetConnectionString("ConferenceRegistrationDbContext"));
+
+                        return new ConferenceRegistrationDbContext(optionsBuilder.Options);
+                    });
+
 //                    services.AddDbContext<PaymentsDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("PaymentsDbContext")));
 //                    services.AddDbContext<PaymentsReadDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("PaymentsReadDbContext")));
-                    services.AddDbContext<ConferenceRegistrationDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConferenceRegistrationDbContext")));
+                    //services.AddDbContext<ConferenceRegistrationDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConferenceRegistrationDbContext")));
+
 //                    services.AddDbContext<BlobStorageDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("BlobStorageDbContext")));
 //                    services.AddDbContext<EventStoreDbContext>(options => options.UseSqlServer(hostContext.Configuration.GetConnectionString("EventStoreDbContext")));
                     

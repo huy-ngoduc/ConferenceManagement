@@ -1,4 +1,4 @@
-﻿@page "/allevent"
+﻿@page "/conference/allevent"
 @inherits AllEventBase;
 
 <h1>All Event</h1>
@@ -17,8 +17,8 @@ else
         @foreach (var conference in Conferences)
         {
             <li>
-                <a href="@($"conference/display/{conference.Code}")" class="btn btn-primary table-btn">
-                    <i class="fas fa-edit"></i>@conference.Name
+                <a class="col-4" href="@($"conference/display/{conference.Code}")">
+                    <i class="fas fa-edit"></i>@conference.Code
                 </a>
             </li>
         }

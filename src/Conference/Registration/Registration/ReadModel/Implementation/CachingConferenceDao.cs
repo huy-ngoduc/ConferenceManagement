@@ -25,9 +25,11 @@
         private readonly IConferenceDao decoratedDao;
         private readonly IMemoryCache  cache;
 
-        public CachingConferenceDao(IConferenceDao decoratedDao, IMemoryCache  cache)
+        private readonly Func<ConferenceRegistrationDbContext> contextFactory;
+
+        public CachingConferenceDao(Func<ConferenceRegistrationDbContext> contextFactory, IMemoryCache  cache)
         {
-            this.decoratedDao = decoratedDao;
+            this.decoratedDao = new ConferenceDao(contextFactory);
             this.cache = cache;
         }
 
