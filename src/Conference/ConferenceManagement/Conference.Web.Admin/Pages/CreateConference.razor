@@ -1,0 +1,73 @@
+﻿@page "/conference/create"
+@inherits CreateConferenceBase
+
+<EditForm Model="@Conference" OnValidSubmit="@CreateValidConference">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <h3>Owner information</h3>
+    <hr>
+    <br />
+
+    <div class="form-group row">
+        <label for="ownerName" class="col-sm-3">Owner Name: </label>
+        <InputText id="ownerName" class="form-control col-sm-5" @bind-Value="@Conference.OwnerName" placeholder="Enter owner name"></InputText>
+        <ValidationMessage For="@(() => Conference.OwnerName)" />
+    </div>
+
+    <div class="form-group">
+        <label for="ownerEmail" class="col-sm-3">Owner Email: </label>
+        <InputText id="ownerEmail" class="form-control col-sm-5" @bind-Value="@Conference.OwnerEmail" placeholder="Enter owner email"></InputText>
+        <ValidationMessage For="@(() => Conference.OwnerEmail)" />
+    </div>
+    <h3>Conference information</h3>
+    <hr>
+    <div class="form-group">
+        <label for="name" class="col-sm-3">Name: </label>
+        <InputText id="name" class="form-control col-sm-5" @bind-Value="@Conference.Name" placeholder="Enter name"></InputText>
+        <ValidationMessage For="@(() => Conference.Name)" />
+    </div>
+    <div class="form-group">
+        <label for="tagline" class="col-sm-3">Tagline: </label>
+        <InputText id="tagline" class="form-control col-sm-5" @bind-Value="@Conference.Tagline" placeholder="Enter tagline"></InputText>
+        <ValidationMessage For="@(() => Conference.Tagline)" />
+    </div>
+    <div class="form-group">
+        <label for="slug" class="col-sm-3">Slug: </label>
+        <InputText id="slug" class="form-control col-sm-5" @bind-Value="@Conference.Slug" placeholder="Enter slug"></InputText>
+        <ValidationMessage For="@(() => Conference.Slug)" />
+    </div>
+    <div class="form-group">
+        <label for="location" class="col-sm-3">Location: </label>
+        <InputText id="location" class="form-control col-sm-5" @bind-Value="@Conference.Location" placeholder="Enter location"></InputText>
+        <ValidationMessage For="@(() => Conference.Location)" />
+    </div>
+
+    <div class="form-group">
+        <label for="twitterSearch" class="col-sm-3">Twitter search: </label>
+        <InputText id="twitterSearch" class="form-control col-sm-5" @bind-Value="@Conference.TwitterSearch" placeholder="Enter twitter search"></InputText>
+        <ValidationMessage For="@(() => Conference.TwitterSearch)" />
+    </div>
+
+    <div class="form-group">
+        <label for="description" class="col-sm-3">Description: </label>
+        <InputTextArea id="description" class="form-control col-sm-5" @bind-Value="@Conference.Description" placeholder="Enter description"></InputTextArea>
+        <ValidationMessage For="@(() => Conference.Description)" />
+    </div>
+    <div class="form-group">
+        <label for="startDate" class="col-sm-3">Start date: </label>
+        <InputDate id="startDate" class="form-control col-sm-5" @bind-Value="@Conference.StartDate" placeholder="Enter start date"></InputDate>
+        <ValidationMessage For="@(() => Conference.StartDate)" />
+    </div>
+    <div class="form-group">
+        <label for="endDate" class="col-sm-3">End date: </label>
+        <InputDate id="endDate" class="form-control col-sm-5" @bind-Value="@Conference.EndDate" placeholder="Enter end date"></InputDate>
+        <ValidationMessage For="@(() => Conference.EndDate)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create conference</button>
+    <NavLink class="nav-link" href="/">
+        Go home
+    </NavLink>
+
+</EditForm>

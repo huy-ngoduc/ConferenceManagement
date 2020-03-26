@@ -1,7 +1,43 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+      <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+      <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Messaging\Handling\**" />
+      <Compile Remove="Serialization\**" />
+      <Compile Remove="BlobStorage\**" />
+      <Compile Remove="Database\**" />
+      <Compile Remove="EventSourcing\**" />
+      <Compile Remove="Messaging\IMessageSessionProvider.cs" />
+      <Compile Remove="Messaging\ICommand.cs" />
+      <Compile Remove="Messaging\IEventPublisher.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Messaging\Handling\**" />
+      <EmbeddedResource Remove="Serialization\**" />
+      <EmbeddedResource Remove="BlobStorage\**" />
+      <EmbeddedResource Remove="Database\**" />
+      <EmbeddedResource Remove="EventSourcing\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Messaging\Handling\**" />
+      <None Remove="Serialization\**" />
+      <None Remove="BlobStorage\**" />
+      <None Remove="Database\**" />
+      <None Remove="EventSourcing\**" />
+    </ItemGroup>
 
 </Project>

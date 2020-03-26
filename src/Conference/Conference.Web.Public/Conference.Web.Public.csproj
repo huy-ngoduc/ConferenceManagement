@@ -1,7 +1,34 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+      <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Registration\Registration\Registration.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\date.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\destination.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\organizers.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\plus.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\press.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\sessions.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Conference\sponsors.png" />
+    </ItemGroup>
 
 </Project>

@@ -20,7 +20,7 @@ namespace Conference
     /// Event raised when a new seat type is created. Note 
     /// that when a seat type is created.
     /// </summary>
-    public class SeatCreated //: IEvent
+    public class SeatCreated : IEvent
     {
         /// <summary>
         /// Gets or sets the conference identifier.

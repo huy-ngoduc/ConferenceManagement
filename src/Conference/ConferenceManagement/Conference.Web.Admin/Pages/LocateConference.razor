@@ -1,0 +1,25 @@
+﻿@page "/conference/locate"
+@inherits LocateConferenceBase
+
+<p>Please enter your email and conference access code to manage your conference:</p>
+<EditForm Model="@LocateModel" OnValidSubmit="@LocateConference">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />   
+    <div class="form-group row">
+        <label for="email">Email: </label>
+        <InputText id="email" class="form-control" @bind-Value="@LocateModel.Email" placeholder="Enter your email"></InputText>
+        <ValidationMessage For="@(() => LocateModel.Email)" />
+    </div>
+
+    <div class="form-group">
+        <label for="accessCode">Access code: </label>
+        <InputText id="accessCode" class="form-control" @bind-Value="@LocateModel.AccessCode" placeholder="Enter the access code"></InputText>
+        <ValidationMessage For="@(() => LocateModel.AccessCode)" />
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Login</button>
+    <a href="/" class="btn btn-primary table-btn">
+        <i class="fas fa-edit"></i>Go home
+    </a>
+</EditForm>

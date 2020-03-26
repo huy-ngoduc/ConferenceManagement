@@ -20,8 +20,8 @@ namespace Registration
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        // [RegularExpression(@"[\w-]+(\.?[\w-])*\@[\w-]+(\.[\w-]+)+", ErrorMessageResourceType = typeof(Resources), ErrorMessageResourceName = "InvalidEmail")]
-        [RegularExpression(@"[\w-]+(\.?[\w-])*\@[\w-]+(\.[\w-]+)+", ErrorMessageResourceType = typeof(Resources), ErrorMessageResourceName = "InvalidEmail")]
+        // TODO: move the message to resource file
+        [RegularExpression(@"[\w-]+(\.?[\w-])*\@[\w-]+(\.[\w-]+)+", ErrorMessage = "The provided email address is not valid.")]
         public string Email { get; set; }
 
         #region Equality

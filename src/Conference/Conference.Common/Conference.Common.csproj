@@ -1,15 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Entity" />
+      <Compile Remove="Entity\ServiceConfigurationSettingConnectionFactory.cs" />
+      <Compile Remove="Entity\**" />
+      <Compile Remove="CollectionExtensions.cs" />
+      <Compile Remove="DictionaryExtensions.cs" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Entity\ServiceConfigurationSettingConnectionFactory.cs" />
+      <PackageReference Include="AutoMapper" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+      <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Entity\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Entity\**" />
     </ItemGroup>
 
 </Project>

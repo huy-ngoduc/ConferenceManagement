@@ -1,0 +1,88 @@
+﻿@page "/conference/{slug}"
+@inherits ConferenceOverviewBase
+
+<h3>Owner information</h3>
+<hr>
+<div class="form-group">
+    <label class="col-4 col-form-label">Name: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.OwnerName</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Owner email: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.OwnerEmail</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Access code: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.AccessCode</label>
+    </div>
+</div>
+
+<h3>Conference information</h3>
+<hr>
+<div class="form-group">
+    <label class="col-4 col-form-label">Name: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.Name</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Tagline: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.Tagline</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Slug: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.Slug</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Location: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.Location</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Twitter search: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.TwitterSearch</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Description: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.Description</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">Start date: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.StartDate.ToString("yyyy/MM/dd")</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-4 col-form-label">End date: </label>
+    <div class="col-8">
+        <label type="text" class="form-control-plaintext">@Conference.EndDate.ToString("yyyy/MM/dd")</label>
+    </div>
+</div>
+@if (string.IsNullOrEmpty(Message))
+{
+    <span class="@(HasError ? "alert-danger" : "alert-success")">@Message</span>
+}
+
+<a href="@($"conference/edit/{Conference.Slug}")" class="btn btn-primary table-btn">
+    <i class="fas fa-edit"></i>Edit
+</a>
+
+<button type="submit" @onclick="@(e => @Conference.IsPublished ? UnPublish() : Publish())" class="btn btn-primary edit-btn float-right">@(@Conference.IsPublished ? "UnPublish" : "Publish")</button>
+
+<a href="@($"conference/seats/{Conference.Slug}")" class="btn btn-primary table-btn">
+    <i class="fas fa-edit"></i>Configure seats
+</a>

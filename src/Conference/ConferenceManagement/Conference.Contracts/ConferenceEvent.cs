@@ -20,7 +20,7 @@ namespace Conference
     /// Base class for conference-related events, containing 
     /// all the conference information.
     /// </summary>
-    public abstract class ConferenceEvent //: IEvent
+    public abstract class ConferenceEvent : IEvent
     {
         public Guid SourceId { get; set; }
 

@@ -1,7 +1,66 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="9.0.0" />
+      <PackageReference Include="MassTransit" Version="6.2.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+      <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Conference.Common\Conference.Common.csproj" />
+      <ProjectReference Include="..\..\Conference.Public.Share\Conference.Public.Share.csproj" />
+      <ProjectReference Include="..\..\ConferenceManagement\Conference.Contracts\Conference.Contracts.csproj" />
+      <ProjectReference Include="..\..\Payments\PaymentsContracts\PaymentsContracts.csproj" />
+      <ProjectReference Include="..\Registration.Contracts\Registration.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Commands\**" />
+      <Compile Remove="Events\**" />
+      <Compile Remove="Handlers\DraftOrderViewModelGenerator.cs" />
+      <Compile Remove="Handlers\OrderCommandHandler.cs" />
+      <Compile Remove="Handlers\PricedOrderViewModelGenerator.cs" />
+      <Compile Remove="Handlers\SeatAssignmentsHandler.cs" />
+      <Compile Remove="Handlers\SeatAssignmentsViewModelGenerator.cs" />
+      <Compile Remove="Handlers\SeatsAvailabilityHandler.cs" />
+      <Compile Remove="ReadModel\Implementation\OrderDao.cs" />
+      <Compile Remove="ReadModel\Implementation\PricedOrderLineSeatTypeDescription.cs" />
+      <Compile Remove="ReadModel\DraftOrder.cs" />
+      <Compile Remove="ReadModel\DraftOrderItem.cs" />
+      <Compile Remove="ReadModel\OrderSeat.cs" />
+      <Compile Remove="ReadModel\OrderSeats.cs" />
+      <Compile Remove="ReadModel\PricedOrder.cs" />
+      <Compile Remove="ReadModel\SeatType.cs" />
+      <Compile Remove="ReadModel\SeatTypeName.cs" />
+      <Compile Remove="Order.cs" />
+      <Compile Remove="OrderItem.cs" />
+      <Compile Remove="OrderState.cs" />
+      <Compile Remove="OrderStateMachine.cs" />
+      <Compile Remove="OrderTotal.cs" />
+      <Compile Remove="PricingService.cs" />
+      <Compile Remove="SeatAssignments.cs" />
+      <Compile Remove="SeatsAvailability.cs" />
+      <Compile Remove="IPricingService.cs" />
+      <Compile Remove="ReadModel\IOrderDao.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Commands\**" />
+      <EmbeddedResource Remove="Events\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Commands\**" />
+      <None Remove="Events\**" />
+    </ItemGroup>
 
 </Project>

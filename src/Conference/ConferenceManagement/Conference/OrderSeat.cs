@@ -11,10 +11,11 @@
 // See the License for the specific language governing permissions and limitations under the License.
 // ==============================================================================================================
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Conference
 {
     using System;
-    using System.ComponentModel.DataAnnotations;
 
     public class OrderSeat
     {

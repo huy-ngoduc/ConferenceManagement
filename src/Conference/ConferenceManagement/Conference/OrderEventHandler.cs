@@ -14,15 +14,16 @@
 using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Contrib.WaitAndRetry;
+using Polly.Retry;
 
 namespace Conference
 {
     using System;
-    using System.Data.Entity;
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
-    using Infrastructure.Messaging.Handling;
     using Registration.Events;
 
     // DEV NOTE:
@@ -56,149 +57,148 @@ namespace Conference
         IConsumer<SeatUnassigned>
     {
         private Func<ConferenceContext> contextFactory;
-
+        private readonly AsyncRetryPolicy retryPolicy;
         public OrderEventHandler(Func<ConferenceContext> contextFactory)
         {
             this.contextFactory = contextFactory;
+            var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+
+            this.retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(delay, (exception, i, span) =>
+                {
+                    Trace.TraceWarning(
+                        $"An error occurred in attempt number {i} to access the database in ConferenceService: {exception.Message}");
+                });
         }
 
         public async Task Consume(ConsumeContext<OrderPlaced> @event)
         {
             await using var context = this.contextFactory.Invoke();
-            context.Orders.Add(new Order(@event.Message.ConferenceId, @event.SourceId, @event.Message.AccessCode));
-            await context.SaveChangesAsync();
+            context.Orders.Add(new Order(@event.Message.ConferenceId, @event.Message.SourceId, @event.Message.AccessCode));
+            await retryPolicy.ExecuteAsync(async () => await context.SaveChangesAsync());
         }
 
-        public void Handle(OrderRegistrantAssigned @event)
+        public async Task Consume(ConsumeContext<OrderRegistrantAssigned> @event)
         {
-            ProcessOrder(order => order.Id == @event.SourceId, order =>
+            await ProcessOrder(order => order.Id == @event.Message.SourceId, order =>
             {
-                order.RegistrantEmail = @event.Email;
-                order.RegistrantName = @event.LastName + ", " + @event.FirstName;
+                order.RegistrantEmail = @event.Message.Email;
+                order.RegistrantName = @event.Message.LastName + ", " + @event.Message.FirstName;
             });
         }
 
-        public void Handle(OrderTotalsCalculated @event)
+        public async Task Consume(ConsumeContext<OrderTotalsCalculated> @event)
         {
-            if (!ProcessOrder(order => order.Id == @event.SourceId, order => order.TotalAmount = @event.Total))
+            if(!await ProcessOrder(order => order.Id == @event.Message.SourceId, order => order.TotalAmount = @event.Message.Total))
             {
-                Trace.TraceError("Failed to locate the order with id {0} to apply calculated totals", @event.SourceId);
+                Trace.TraceError("Failed to locate the order with id {0} to apply calculated totals", @event.Message.SourceId);
             }
         }
 
-        public void Handle(OrderConfirmed @event)
+        public async Task Consume(ConsumeContext<OrderConfirmed> @event)
         {
-            if (!ProcessOrder(order => order.Id == @event.SourceId, order => order.Status = Order.OrderStatus.Paid))
+            if (!await ProcessOrder(order => order.Id == @event.Message.SourceId, order => order.Status = Order.OrderStatus.Paid))
             {
-                Trace.TraceError("Failed to locate the order with {0} to apply confirmed payment.", @event.SourceId);
+                Trace.TraceError("Failed to locate the order with {0} to apply confirmed payment.", @event.Message.SourceId);
             }
         }
 
-        public void Handle(OrderExpired @event)
+        public async Task Consume(ConsumeContext<OrderExpired> @event)
         {
-            using (var context = this.contextFactory.Invoke())
+            await using var context = this.contextFactory.Invoke();
+            var order = await context.Orders.FirstOrDefaultAsync(x => x.Id == @event.Message.SourceId);
+            if (order != null)
             {
-                var order = context.Orders.FirstOrDefault(x => x.Id == @event.SourceId);
-                if (order != null)
-                {
-                    context.Orders.Remove(order);
-                    context.SaveChanges();
-                }
+                context.Orders.Remove(order);
+                context.SaveChanges();
             }
         }
 
-        public void Handle(SeatAssignmentsCreated @event)
+        public async Task Consume(ConsumeContext<SeatAssignmentsCreated> @event)
         {
-            if (!ProcessOrder(order => order.Id == @event.OrderId, order => order.AssignmentsId = @event.SourceId))
+            if (!await ProcessOrder(order => order.Id == @event.Message.OrderId, order => order.AssignmentsId = @event.Message.SourceId))
             {
-                Trace.TraceError("Failed to locate the order with {0} for the seat assignments being created with id {1}.", @event.OrderId, @event.SourceId);
+                Trace.TraceError("Failed to locate the order with {0} for the seat assignments being created with id {1}.", @event.Message.OrderId, @event.Message.SourceId);
             }
         }
 
-        public void Handle(SeatAssigned @event)
+        public async Task Consume(ConsumeContext<SeatAssigned> @event)
         {
-            if (!ProcessOrder(order => order.AssignmentsId == @event.SourceId, order =>
+            if (!await ProcessOrder(order => order.AssignmentsId == @event.Message.SourceId, order =>
             {
-                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Position);
+                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Message.Position);
                 if (seat != null)
                 {
-                    seat.Attendee.FirstName = @event.Attendee.FirstName;
-                    seat.Attendee.LastName = @event.Attendee.LastName;
-                    seat.Attendee.Email = @event.Attendee.Email;
+                    seat.Attendee.FirstName = @event.Message.Attendee.FirstName;
+                    seat.Attendee.LastName = @event.Message.Attendee.LastName;
+                    seat.Attendee.Email = @event.Message.Attendee.Email;
                 }
                 else
                 {
-                    order.Seats.Add(new OrderSeat(@event.SourceId, @event.Position, @event.SeatType)
+                    order.Seats.Add(new OrderSeat(@event.Message.SourceId, @event.Message.Position, @event.Message.SeatType)
                     {
                         Attendee = new Attendee
                         {
-                            FirstName = @event.Attendee.FirstName,
-                            LastName = @event.Attendee.LastName,
-                            Email = @event.Attendee.Email,
+                            FirstName = @event.Message.Attendee.FirstName,
+                            LastName = @event.Message.Attendee.LastName,
+                            Email = @event.Message.Attendee.Email,
                         }
                     });
                 }
             }))
             {
-                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat assignment being assigned at position {1}.", @event.SourceId, @event.Position);
+                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat assignment being assigned at position {1}.", @event.Message.SourceId, @event.Message.Position);
             }
         }
 
-        public void Handle(SeatAssignmentUpdated @event)
+        public async Task Consume(ConsumeContext<SeatAssignmentUpdated> @event)
         {
-            if (!ProcessOrder(order => order.AssignmentsId == @event.SourceId, order =>
+            if (!await ProcessOrder(order => order.AssignmentsId == @event.Message.SourceId, order =>
             {
-                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Position);
+                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Message.Position);
                 if (seat != null)
                 {
-                    seat.Attendee.FirstName = @event.Attendee.FirstName;
-                    seat.Attendee.LastName = @event.Attendee.LastName;
+                    seat.Attendee.FirstName = @event.Message.Attendee.FirstName;
+                    seat.Attendee.LastName = @event.Message.Attendee.LastName;
                 }
                 else
                 {
-                    Trace.TraceError("Failed to locate the seat being updated at position {0} for assignment {1}.", @event.Position, @event.SourceId);
+                    Trace.TraceError("Failed to locate the seat being updated at position {0} for assignment {1}.", @event.Message.Position, @event.Message.SourceId);
                 }
             }))
             {
-                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat assignment being updated at position {1}.", @event.SourceId, @event.Position);
+                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat assignment being updated at position {1}.", @event.Message.SourceId, @event.Message.Position);
             }
         }
 
-        public void Handle(SeatUnassigned @event)
+        public async Task Consume(ConsumeContext<SeatUnassigned> @event)
         {
-            if (!ProcessOrder(order => order.AssignmentsId == @event.SourceId, order =>
+            if (!await ProcessOrder(order => order.AssignmentsId == @event.Message.SourceId, order =>
             {
-                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Position);
+                var seat = order.Seats.FirstOrDefault(x => x.Position == @event.Message.Position);
                 if (seat != null)
                 {
                     order.Seats.Remove(seat);
                 }
                 else
                 {
-                    Trace.TraceError("Failed to locate the seat being unassigned at position {0} for assignment {1}.", @event.Position, @event.SourceId);
+                    Trace.TraceError("Failed to locate the seat being unassigned at position {0} for assignment {1}.", @event.Message.Position, @event.Message.SourceId);
                 }
             }))
             {
-                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat being unassigned at position {1}.", @event.SourceId, @event.Position);
+                Trace.TraceError("Failed to locate the order with seat assignments id {0} for the seat being unassigned at position {1}.", @event.Message.SourceId, @event.Message.Position);
             }
         }
 
-        private bool ProcessOrder(Expression<Func<Order, bool>> lookup, Action<Order> orderAction)
+        private async Task<bool> ProcessOrder(Expression<Func<Order, bool>> lookup, Action<Order> orderAction)
         {
-            using (var context = this.contextFactory.Invoke())
-            {
-                var order = context.Orders.Include(x => x.Seats).FirstOrDefault(lookup);
-                if (order != null)
-                {
-                    orderAction.Invoke(order);
-                    context.SaveChanges();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            await using var context = this.contextFactory.Invoke();
+            var order = context.Orders.Include(x => x.Seats).FirstOrDefault(lookup);
+            if (order == null) return false;
+            orderAction.Invoke(order);
+            await context.SaveChangesAsync();
+            return true;
         }
     }
 }

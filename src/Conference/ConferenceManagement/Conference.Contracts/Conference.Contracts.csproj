@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -6,6 +6,19 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+      <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="SeatCreated.cs" />
+      <Compile Remove="SeatUpdated.cs" />
     </ItemGroup>
 
 </Project>

@@ -11,17 +11,20 @@
 // See the License for the specific language governing permissions and limitations under the License.
 // ==============================================================================================================
 
+
 namespace Conference
 {
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.Entity;
     using System.Diagnostics;
     using System.Linq;
-    using Infrastructure.Messaging;
-    using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.SqlAzure;
-    using Microsoft.Practices.TransientFaultHandling;
+    using System.Threading.Tasks;
+    using MassTransit;
+    using Microsoft.EntityFrameworkCore;
+    using Polly;
+    using Polly.Contrib.WaitAndRetry;
+    using Polly.Retry;
 
     /// <summary>
     /// Transaction-script style domain service that manages 
@@ -31,38 +34,42 @@ namespace Conference
     /// </summary>
     public class ConferenceService
     {
-        private readonly IEventBus eventBus;
-        private readonly string nameOrConnectionString;
-        private readonly RetryPolicy<SqlAzureTransientErrorDetectionStrategy> retryPolicy;
+        private readonly ConferenceContext context;
+        private readonly IBus bus;
+        private readonly AsyncRetryPolicy retryPolicy;
 
-        public ConferenceService(IEventBus eventBus, string nameOrConnectionString = "ConferenceManagement")
+        public ConferenceService(IBus bus, ConferenceContext conferenceContext)
         {
-            // NOTE: the database storage cannot be transactionally consistent with the 
+            // NOTE: the database storage cannot be transactional consistent with the 
             // event bus, so there is a chance that the conference state is saved 
             // to the database but the events are not published. The recommended 
             // mechanism to solve this lack of transaction support is to persist 
             // failed events to a table in the same database as the conference, in a 
-            // queue that is retried until successfull delivery of events is 
-            // guaranteed. This mechamisn has been implemented for the AzureEventSourcedRepository
+            // queue that is retried until successful delivery of events is 
+            // guaranteed. This mechanism has been implemented for the AzureEventSourcedRepository
             // and that implementation can be used as a guide to implement it here too.
 
-            this.eventBus = eventBus;
-            this.nameOrConnectionString = nameOrConnectionString;
+            context = conferenceContext;
+            this.bus = bus;
 
-            this.retryPolicy = new RetryPolicy<SqlAzureTransientErrorDetectionStrategy>(new Incremental(5, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1.5)) { FastFirstRetry = true });
-            this.retryPolicy.Retrying += (s, e) =>
-                Trace.TraceWarning("An error occurred in attempt number {1} to access the database in ConferenceService: {0}", e.LastException.Message, e.CurrentRetryCount);
- 
+            var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+
+            this.retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(delay, (exception, i, span) =>
+                {
+                    Trace.TraceWarning(
+                        $"An error occurred in attempt number {i} to access the database in ConferenceService: {exception.Message}");
+                });
         }
 
-        public void CreateConference(ConferenceInfo conference)
+        public async Task CreateConference(ConferenceInfo conference)
         {
-            using var context = new ConferenceContext(this.nameOrConnectionString);
-            var existingSlug = this.retryPolicy.ExecuteAction(() => 
-                context.Conferences
+            var existingSlug = await this.retryPolicy.ExecuteAsync(async () =>
+                await context.Conferences
                     .Where(c => c.Slug == conference.Slug)
                     .Select(c => c.Slug)
-                    .Any());
+                    .AnyAsync());
 
             if (existingSlug)
                 throw new DuplicateNameException("The chosen conference slug is already taken.");
@@ -72,189 +79,163 @@ namespace Conference
                 conference.IsPublished = false;
 
             context.Conferences.Add(conference);
-            this.retryPolicy.ExecuteAction(() => context.SaveChanges());
+            await this.retryPolicy.ExecuteAsync(async () => await context.SaveChangesAsync());
+            await this.PublishConferenceEvent<ConferenceCreated>(conference);
+        }
+//
+//        public async Task CreateSeat(Guid conferenceId, SeatType seat)
+//        {
+//            var conference =
+//                await this.retryPolicy.ExecuteAsync(async () => await context.Conferences.FindAsync(conferenceId));
+//            if (conference == null)
+//                throw new Exception(); //TODO: ObjectNotFoundException
+//
+//            conference.Seats.Add(seat);
+//            await this.retryPolicy.ExecuteAsync(async () => await context.SaveChangesAsync());
+//
+//            // Don't publish new seats if the conference was never published 
+//            // (and therefore is not published either).
+//            if (conference.WasEverPublished)
+//                await this.PublishSeatCreated(conferenceId, seat);
+//        }
 
-            this.PublishConferenceEvent<ConferenceCreated>(conference);
+        public async Task<ConferenceInfo> FindConference(string slug)
+        {
+            return await this.retryPolicy.ExecuteAsync(async () =>await context.Conferences.FirstOrDefaultAsync(x => x.Slug == slug));
         }
 
-        public void CreateSeat(Guid conferenceId, SeatType seat)
+        public async Task<ConferenceInfo> FindConference(string email, string accessCode)
         {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
+            return await this.retryPolicy.ExecuteAsync(async() =>
+                await context.Conferences.FirstOrDefaultAsync(x => x.OwnerEmail == email && x.AccessCode == accessCode));
+        }
+//
+//        public async Task<IEnumerable<SeatType>> FindSeatTypes(Guid conferenceId)
+//        {
+//            return await this.retryPolicy.ExecuteAsync(async () => await
+//                       context.Conferences
+//                           .Include(x => x.Seats)
+//                           .Where(x => x.Id == conferenceId)
+//                           .Select(x => x.Seats)
+//                           .FirstOrDefaultAsync()) ??
+//                   Enumerable.Empty<SeatType>();
+//        }
+//
+//        public async Task<SeatType> FindSeatType(Guid seatTypeId)
+//        {
+//            return await this.retryPolicy.ExecuteAsync(async () => await context.Seats.FindAsync(seatTypeId));
+//        }
+//
+//        public async Task<IEnumerable<Order>> FindOrders(Guid conferenceId)
+//        {
+//            return await this.retryPolicy.ExecuteAsync(async () =>await context.Orders.Include("Seats.SeatInfo")
+//                .Where(x => x.ConferenceId == conferenceId)
+//                .ToListAsync());
+//        }
+
+        public async Task UpdateConference(ConferenceInfo conference)
+        {
+            var existing = await this.retryPolicy.ExecuteAsync(async () =>await context.Conferences.FindAsync(conference.Id));
+            if (existing == null)
+                throw new Exception(); //ObjectNotFoundException
+
+            context.Entry(existing).CurrentValues.SetValues(conference);
+            await this.retryPolicy.ExecuteAsync(async () =>await context.SaveChangesAsync());
+
+            await this.PublishConferenceEvent<ConferenceUpdated>(conference);
+        }
+
+//        public async Task UpdateSeat(Guid conferenceId, SeatType seat)
+//        {
+//            var existing = await this.retryPolicy.ExecuteAsync(async () =>await context.Seats.FindAsync(seat.Id));
+//            if (existing == null)
+//                throw new Exception(); //ObjectNotFoundException
+//
+//            context.Entry(existing).CurrentValues.SetValues(seat);
+//            await this.retryPolicy.ExecuteAsync(async () =>await context.SaveChangesAsync());
+//
+//            // Don't publish seat updates if the conference was never published 
+//            // (and therefore is not published either).
+//            if (await this.retryPolicy.ExecuteAsync(async () =>await 
+//                context.Conferences.Where(x => x.Id == conferenceId).Select(x => x.WasEverPublished)
+//                    .FirstOrDefaultAsync()))
+//            {
+//                await this.bus.Publish(new SeatUpdated
+//                {
+//                    ConferenceId = conferenceId,
+//                    SourceId = seat.Id,
+//                    Name = seat.Name,
+//                    Description = seat.Description,
+//                    Price = seat.Price,
+//                    Quantity = seat.Quantity,
+//                });
+//            }
+//        }
+
+        public async Task Publish(Guid conferenceId)
+        {
+            await this.UpdatePublished(conferenceId, true);
+        }
+
+        public async Task Unpublish(Guid conferenceId)
+        {
+            await this.UpdatePublished(conferenceId, false);
+        }
+
+        private async Task UpdatePublished(Guid conferenceId, bool isPublished)
+        {
+            var conference = await this.retryPolicy.ExecuteAsync(async () =>await context.Conferences.FindAsync(conferenceId));
+            if (conference == null)
+                throw new Exception(); //TODO: ObjectNotFoundException
+
+            conference.IsPublished = isPublished;
+            if (isPublished && !conference.WasEverPublished)
             {
-                var conference = this.retryPolicy.ExecuteAction(() => context.Conferences.Find(conferenceId));
-                if (conference == null)
-                    throw new ObjectNotFoundException();
-
-                conference.Seats.Add(seat);
-                this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-
-                // Don't publish new seats if the conference was never published 
-                // (and therefore is not published either).
-                if (conference.WasEverPublished)
-                    this.PublishSeatCreated(conferenceId, seat);
+                // This flags prevents any further seat type deletions.
+                conference.WasEverPublished = true;
+                await this.retryPolicy.ExecuteAsync(async () =>await context.SaveChangesAsync());
+//
+//                // We always publish events *after* saving to store.
+//                // Publish all seats that were created before.
+//                foreach (var seat in conference.Seats)
+//                {
+//                    await PublishSeatCreated(conference.Id, seat);
+//                }
             }
-        }
-
-        public ConferenceInfo FindConference(string slug)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
+            else
             {
-                return this.retryPolicy.ExecuteAction(() => context.Conferences.FirstOrDefault(x => x.Slug == slug));
+                await this.retryPolicy.ExecuteAsync(async () =>await context.SaveChangesAsync());
             }
+
+            if (isPublished)
+                await this.bus.Publish(new ConferencePublished {SourceId = conferenceId});
+            else
+                await this.bus.Publish(new ConferenceUnpublished {SourceId = conferenceId});
         }
+//
+//        public async Task DeleteSeat(Guid id)
+//        {
+//            var seat = await this.retryPolicy.ExecuteAsync(async () =>await context.Seats.FindAsync(id));
+//            if (seat == null)
+//                throw new Exception(); //TODO: ObjectNotFoundException
+//
+//            var wasPublished = await this.retryPolicy.ExecuteAsync(async () =>await context.Conferences
+//                .Where(x => x.Seats.Any(s => s.Id == id))
+//                .Select(x => x.WasEverPublished)
+//                .FirstOrDefaultAsync());
+//
+//            if (wasPublished)
+//                throw new InvalidOperationException(
+//                    "Can't delete seats from a conference that has been published at least once.");
+//
+//            context.Seats.Remove(seat);
+//            await this.retryPolicy.ExecuteAsync(async () =>await context.SaveChangesAsync());
+//        }
 
-        public ConferenceInfo FindConference(string email, string accessCode)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                return this.retryPolicy.ExecuteAction(() => context.Conferences.FirstOrDefault(x => x.OwnerEmail == email && x.AccessCode == accessCode));
-            }
-        }
-
-        public IEnumerable<SeatType> FindSeatTypes(Guid conferenceId)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                return this.retryPolicy.ExecuteAction(() => 
-                    context.Conferences
-                        .Include(x => x.Seats)
-                        .Where(x => x.Id == conferenceId)
-                        .Select(x => x.Seats)
-                        .FirstOrDefault()) ??
-                    Enumerable.Empty<SeatType>();
-            }
-        }
-
-        public SeatType FindSeatType(Guid seatTypeId)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                return this.retryPolicy.ExecuteAction(() => context.Seats.Find(seatTypeId));
-            }
-        }
-
-        public IEnumerable<Order> FindOrders(Guid conferenceId)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                return this.retryPolicy.ExecuteAction(() => context.Orders.Include("Seats.SeatInfo")
-                    .Where(x => x.ConferenceId == conferenceId)
-                    .ToList());
-            }
-        }
-
-        public void UpdateConference(ConferenceInfo conference)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                var existing = this.retryPolicy.ExecuteAction(() => context.Conferences.Find(conference.Id));
-                if (existing == null)
-                    throw new ObjectNotFoundException();
-
-                context.Entry(existing).CurrentValues.SetValues(conference);
-                this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-
-                this.PublishConferenceEvent<ConferenceUpdated>(conference);
-            }
-        }
-
-        public void UpdateSeat(Guid conferenceId, SeatType seat)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                var existing = this.retryPolicy.ExecuteAction(() => context.Seats.Find(seat.Id));
-                if (existing == null)
-                    throw new ObjectNotFoundException();
-
-                context.Entry(existing).CurrentValues.SetValues(seat);
-                this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-
-                // Don't publish seat updates if the conference was never published 
-                // (and therefore is not published either).
-                if (this.retryPolicy.ExecuteAction(() => context.Conferences.Where(x => x.Id == conferenceId).Select(x => x.WasEverPublished).FirstOrDefault()))
-                {
-                    this.eventBus.Publish(new SeatUpdated
-                    {
-                        ConferenceId = conferenceId,
-                        SourceId = seat.Id,
-                        Name = seat.Name,
-                        Description = seat.Description,
-                        Price = seat.Price,
-                        Quantity = seat.Quantity,
-                    });
-                }
-            }
-        }
-
-        public void Publish(Guid conferenceId)
-        {
-            this.UpdatePublished(conferenceId, true);
-        }
-
-        public void Unpublish(Guid conferenceId)
-        {
-            this.UpdatePublished(conferenceId, false);
-        }
-
-        private void UpdatePublished(Guid conferenceId, bool isPublished)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                var conference = this.retryPolicy.ExecuteAction(() => context.Conferences.Find(conferenceId));
-                if (conference == null)
-                    throw new ObjectNotFoundException();
-
-                conference.IsPublished = isPublished;
-                if (isPublished && !conference.WasEverPublished)
-                {
-                    // This flags prevents any further seat type deletions.
-                    conference.WasEverPublished = true;
-                    this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-
-                    // We always publish events *after* saving to store.
-                    // Publish all seats that were created before.
-                    foreach (var seat in conference.Seats)
-                    {
-                        PublishSeatCreated(conference.Id, seat);
-                    }
-                }
-                else
-                {
-                    this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-                }
-
-                if (isPublished)
-                    this.eventBus.Publish(new ConferencePublished { SourceId = conferenceId });
-                else
-                    this.eventBus.Publish(new ConferenceUnpublished { SourceId = conferenceId });
-            }
-        }
-
-        public void DeleteSeat(Guid id)
-        {
-            using (var context = new ConferenceContext(this.nameOrConnectionString))
-            {
-                var seat = this.retryPolicy.ExecuteAction(() => context.Seats.Find(id));
-                if (seat == null)
-                    throw new ObjectNotFoundException();
-
-                var wasPublished = this.retryPolicy.ExecuteAction(() => context.Conferences
-                    .Where(x => x.Seats.Any(s => s.Id == id))
-                    .Select(x => x.WasEverPublished)
-                    .FirstOrDefault());
-
-                if (wasPublished)
-                    throw new InvalidOperationException("Can't delete seats from a conference that has been published at least once.");
-
-                context.Seats.Remove(seat);
-                this.retryPolicy.ExecuteAction(() => context.SaveChanges());
-            }
-        }
-
-        private void PublishConferenceEvent<T>(ConferenceInfo conference)
+        private async Task PublishConferenceEvent<T>(ConferenceInfo conference)
             where T : ConferenceEvent, new()
         {
-            this.eventBus.Publish(new T()
+            await this.retryPolicy.ExecuteAsync(async () => await this.bus.Publish(new T()
             {
                 SourceId = conference.Id,
                 Owner = new Owner
@@ -270,20 +251,20 @@ namespace Conference
                 TwitterSearch = conference.TwitterSearch,
                 StartDate = conference.StartDate,
                 EndDate = conference.EndDate,
-            });
+            }));
         }
-
-        private void PublishSeatCreated(Guid conferenceId, SeatType seat)
-        {
-            this.eventBus.Publish(new SeatCreated
-            {
-                ConferenceId = conferenceId,
-                SourceId = seat.Id,
-                Name = seat.Name,
-                Description = seat.Description,
-                Price = seat.Price,
-                Quantity = seat.Quantity,
-            });
-        }
+//
+//        private async Task PublishSeatCreated(Guid conferenceId, SeatType seat)
+//        {
+//            await this.retryPolicy.ExecuteAsync(async () => await this.bus.Publish(new SeatCreated
+//            {
+//                ConferenceId = conferenceId,
+//                SourceId = seat.Id,
+//                Name = seat.Name,
+//                Description = seat.Description,
+//                Price = seat.Price,
+//                Quantity = seat.Quantity,
+//            }));
+//        }
     }
 }

@@ -15,25 +15,9 @@ namespace Conference.Web.Admin
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    await services.GetRequiredService<ConferenceContext>().Database.EnsureCreatedAsync();
-                }
-                catch (Exception e)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(e, "An error occured while seeding the database");
-                }
-            }
-            
-            host.Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

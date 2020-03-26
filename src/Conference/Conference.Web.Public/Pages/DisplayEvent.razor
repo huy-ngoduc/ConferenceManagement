@@ -1,0 +1,60 @@
+﻿@page "/conference/{conferenceCode}"
+@inherits DisplayEventBase;
+
+<h1>Event details</h1>
+
+@if (Conference == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    
+@($"{Conference.Name}-{Conference.Tagline}")
+    <div class="form-group">
+        <label class="col-4 col-form-label">Name: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.Name</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-4 col-form-label">Tagline: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.Tagline</label>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-4 col-form-label">Location: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.Location</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-4 col-form-label">Twitter search: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.TwitterSearch</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-4 col-form-label">Description: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.Description</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-4 col-form-label">Start date: </label>
+        <div class="col-8">
+            <label type="text" class="form-control-plaintext">@Conference.StartDate.ToString("yyyy/MM/dd")</label>
+        </div>
+    </div>
+    
+    <a href="@($"conference/register/{ConferenceCode}")" class="btn btn-primary table-btn">
+        <i class="fas fa-edit"></i>Register
+    </a>
+    <a href="@("conference/allevent")" class="btn btn-primary table-btn">
+        <i class="fas fa-edit"></i>All Event
+    </a>
+}

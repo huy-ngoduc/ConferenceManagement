@@ -10,7 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Conference.Web.Admin.Data;
+using Conference.Web.Admin.Services;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace Conference.Web.Admin
 {
@@ -29,12 +32,12 @@ namespace Conference.Web.Admin
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
 
-            services.AddDbContext<ConferenceContext>(options =>
+            services.AddHttpClient<IConferenceAdminService, ConferenceAdminService>(httpClient =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                httpClient.BaseAddress = new Uri(Configuration.GetValue<string>("Conference.Admin.Api:Url"));
             });
+            services.AddProtectedBrowserStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -28,8 +28,8 @@ namespace Conference
         }
         
         public virtual DbSet<ConferenceInfo> Conferences { get; set; }
-        public virtual DbSet<SeatType> Seats { get; set; }
-        public virtual DbSet<Order> Orders { get; set; }
+//        public virtual DbSet<SeatType> Seats { get; set; }
+//        public virtual DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,16 +41,17 @@ namespace Conference
             // table name collisions, while reducing the deployment costs.
 
             modelBuilder.Entity<ConferenceInfo>().ToTable("Conferences", SchemaName);
-            // Make seat infos required to have a conference info associated, but without 
-            // having to add a navigation property (don't polute the object model).
-            modelBuilder.Entity<ConferenceInfo>()
-                .HasMany(x => x.Seats)
-                .WithOne(x=>x.ConferenceInfo)
-                .IsRequired();
-            modelBuilder.Entity<SeatType>().ToTable("SeatTypes", SchemaName);
-            modelBuilder.Entity<Order>().ToTable("Orders", SchemaName);
-            modelBuilder.Entity<OrderSeat>().ToTable("OrderSeats", SchemaName);
-            modelBuilder.Entity<OrderSeat>().HasKey(seat => new {seat.OrderId, seat.Position});
+//            // Make seat infos required to have a conference info associated, but without 
+//            // having to add a navigation property (don't polute the object model).
+//            modelBuilder.Entity<ConferenceInfo>()
+//                .HasMany(x => x.Seats)
+//                .WithOne(x=>x.ConferenceInfo)
+//                .IsRequired();
+//            modelBuilder.Entity<SeatType>().ToTable("SeatTypes", SchemaName);
+//            modelBuilder.Entity<Order>().ToTable("Orders", SchemaName);
+//            modelBuilder.Entity<OrderSeat>().ToTable("OrderSeats", SchemaName);
+//            modelBuilder.Entity<OrderSeat>(entity => { entity.OwnsOne(e => e.Attendee); });
+//            modelBuilder.Entity<OrderSeat>().HasKey(seat => new {seat.OrderId, seat.Position});
         }
     }
 }

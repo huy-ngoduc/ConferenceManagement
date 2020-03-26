@@ -1,0 +1,12 @@
+﻿{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Debug",
+            "System": "Information",
+            "Microsoft": "Information"
+        }
+    },
+    "ConnectionStrings": {
+        "defaultConnection": "Server=.\\SQLEXPRESS;Database=conference_v1;Trusted_Connection=True;MultipleActiveResultSets=true"
+    }
+}

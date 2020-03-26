@@ -11,11 +11,12 @@
 // See the License for the specific language governing permissions and limitations under the License.
 // ==============================================================================================================
 
-namespace Infrastructure.EventSourcing
+ using Infrastructure.Messaging;
+
+ namespace Infrastructure.EventSourcing
 {
     using System;
     using System.Collections.Generic;
-    using Infrastructure.Messaging;
 
     public abstract class EventSourced : IEventSourced
     {

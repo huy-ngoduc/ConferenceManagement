@@ -1,0 +1,26 @@
+﻿@page "/allevent"
+@inherits AllEventBase;
+
+<h1>All Event</h1>
+<p>
+    Go to the specific conference page:
+</p>
+@if (Conferences == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <ul>
+        @foreach (var conference in Conferences)
+        {
+            <li>
+                <a href="@($"conference/display/{conference.Code}")" class="btn btn-primary table-btn">
+                    <i class="fas fa-edit"></i>@conference.Name
+                </a>
+            </li>
+        }
+    </ul>
+}

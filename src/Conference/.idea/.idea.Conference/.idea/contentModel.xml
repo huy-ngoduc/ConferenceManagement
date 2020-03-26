@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="C:\Users\huyng\.Rider2019.3\system\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\huyng\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_Conference.797858177.00" t="ExcludeRecursive" />
-    <e p="D:\projects\github\ConferenceManagement\ConferenceManagement\src\Conference" t="IncludeFlat">
+    <e p="C:\Users\huy-lap\.Rider2019.2\config\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\huy-lap\.Rider2019.2\config\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\huy-lap\.Rider2019.2\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\huy-lap\.Rider2019.2\system\resharper-host\local\Transient\ReSharperHost\v192\SolutionCaches\_Conference.-1037984563.00" t="ExcludeRecursive" />
+    <e p="D:\workspace\github\ConferenceManagement\src\Conference" t="IncludeFlat">
+      <e p="CommandProcessorWorker" t="IncludeRecursive">
+        <e p="AppConfig.cs" t="Include" />
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="BusService.cs" t="Include" />
+        <e p="CommandProcessorWorker.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="CommandProcessorWorker.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+      </e>
       <e p="Conference.Common" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
-        <e p="CollectionExtensions.cs" t="Include" />
         <e p="Conference.Common.csproj" t="IncludeRecursive" />
-        <e p="DictionaryExtensions.cs" t="Include" />
-        <e p="Entity" t="Include" />
-        <e p="MaintenanceMode.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
@@ -22,6 +39,41 @@
           <e p="HandleGenerator.cs" t="Include" />
         </e>
       </e>
+      <e p="Conference.Public.Api" t="IncludeRecursive">
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Conference.Public.Api.csproj" t="IncludeRecursive" />
+        <e p="Controllers" t="Include">
+          <e p="ConferenceController.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Conference.Public.Api.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Startup.cs" t="Include" />
+      </e>
+      <e p="Conference.Public.Share" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Conference.cs" t="Include" />
+        <e p="Conference.Public.Share.csproj" t="IncludeRecursive" />
+        <e p="ConferenceAlias.cs" t="Include" />
+        <e p="ConferenceDetails.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Conference.Public.Share.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
       <e p="Conference.sln" t="IncludeFlat" />
       <e p="Conference.Web.Public" t="IncludeRecursive">
         <e p="_Imports.razor" t="Include" />
@@ -30,28 +82,29 @@
         <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="Conference.Web.Public.csproj" t="IncludeRecursive" />
-        <e p="Data" t="Include">
-          <e p="WeatherForecast.cs" t="Include" />
-          <e p="WeatherForecastService.cs" t="Include" />
-        </e>
+        <e p="Data" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
               <e p="Conference.Web.Public.AssemblyInfo.cs" t="Include" />
-              <e p="Conference.Web.Public.RazorAssemblyInfo.cs" t="Include" />
             </e>
           </e>
         </e>
         <e p="Pages" t="Include">
           <e p="_Host.cshtml" t="Include" />
-          <e p="Counter.razor" t="Include" />
+          <e p="AllEvent.razor" t="Include" />
+          <e p="AllEventBase.cs" t="Include" />
+          <e p="DisplayEvent.razor" t="Include" />
+          <e p="DisplayEventBase.cs" t="Include" />
           <e p="Error.razor" t="Include" />
-          <e p="FetchData.razor" t="Include" />
           <e p="Index.razor" t="Include" />
         </e>
         <e p="Program.cs" t="Include" />
         <e p="Properties" t="Include">
           <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Services" t="Include">
+          <e p="ConferenceService.cs" t="Include" />
         </e>
         <e p="Shared" t="Include">
           <e p="MainLayout.razor" t="Include" />
@@ -88,7 +141,6 @@
       </e>
       <e p="ConferenceManagement" t="Include">
         <e p="Conference" t="IncludeRecursive">
-          <e p="Attendee.cs" t="Include" />
           <e p="bin" t="ExcludeRecursive" />
           <e p="Conference.csproj" t="IncludeRecursive" />
           <e p="ConferenceContext.cs" t="Include" />
@@ -101,10 +153,44 @@
               </e>
             </e>
           </e>
-          <e p="Order.cs" t="Include" />
-          <e p="OrderEventHandler.cs" t="Include" />
-          <e p="OrderSeat.cs" t="Include" />
-          <e p="SeatType.cs" t="Include" />
+        </e>
+        <e p="Conference.Admin.Api" t="IncludeRecursive">
+          <e p="appsettings.Development.json" t="Include" />
+          <e p="appsettings.json" t="Include" />
+          <e p="AutoMapperProfile.cs" t="Include" />
+          <e p="bin" t="ExcludeRecursive" />
+          <e p="BusService.cs" t="Include" />
+          <e p="Conference.Admin.Api.csproj" t="IncludeRecursive" />
+          <e p="Controllers" t="Include">
+            <e p="ConferenceController.cs" t="Include" />
+          </e>
+          <e p="obj" t="ExcludeRecursive">
+            <e p="Debug" t="Include">
+              <e p="netcoreapp3.1" t="Include">
+                <e p="Conference.Admin.Api.AssemblyInfo.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+          <e p="Program.cs" t="Include" />
+          <e p="Properties" t="Include">
+            <e p="launchSettings.json" t="Include" />
+          </e>
+          <e p="Startup.cs" t="Include" />
+        </e>
+        <e p="Conference.Admin.Share" t="IncludeRecursive">
+          <e p="bin" t="ExcludeRecursive" />
+          <e p="Conference.Admin.Share.csproj" t="IncludeRecursive" />
+          <e p="ConferenceCreateInputModel.cs" t="Include" />
+          <e p="ConferenceEditInputModel.cs" t="Include" />
+          <e p="ConferenceReadModel.cs" t="Include" />
+          <e p="obj" t="ExcludeRecursive">
+            <e p="Debug" t="Include">
+              <e p="netcoreapp3.1" t="Include">
+                <e p="Conference.Admin.Share.AssemblyInfo.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+          <e p="PublishInputModel.cs" t="Include" />
         </e>
         <e p="Conference.Contracts" t="IncludeRecursive">
           <e p="bin" t="ExcludeRecursive" />
@@ -122,8 +208,6 @@
             </e>
           </e>
           <e p="Owner.cs" t="Include" />
-          <e p="SeatCreated.cs" t="Include" />
-          <e p="SeatUpdated.cs" t="Include" />
         </e>
         <e p="Conference.Web.Admin" t="IncludeRecursive">
           <e p="_Imports.razor" t="Include" />
@@ -131,29 +215,36 @@
           <e p="appsettings.Development.json" t="Include" />
           <e p="appsettings.json" t="Include" />
           <e p="bin" t="ExcludeRecursive" />
+          <e p="Components" t="Include" />
           <e p="Conference.Web.Admin.csproj" t="IncludeRecursive" />
           <e p="Data" t="Include">
-            <e p="WeatherForecast.cs" t="Include" />
-            <e p="WeatherForecastService.cs" t="Include" />
+            <e p="LocateInputModel.cs" t="Include" />
           </e>
           <e p="obj" t="ExcludeRecursive">
             <e p="Debug" t="Include">
               <e p="netcoreapp3.1" t="Include">
                 <e p="Conference.Web.Admin.AssemblyInfo.cs" t="Include" />
-                <e p="Conference.Web.Admin.RazorAssemblyInfo.cs" t="Include" />
               </e>
             </e>
           </e>
           <e p="Pages" t="Include">
             <e p="_Host.cshtml" t="Include" />
-            <e p="Counter.razor" t="Include" />
+            <e p="ConferenceOverview.razor" t="Include" />
+            <e p="ConferenceOverviewBase.cs" t="Include" />
+            <e p="CreateConference.razor" t="Include" />
+            <e p="CreateConferenceBase.cs" t="Include" />
             <e p="Error.razor" t="Include" />
-            <e p="FetchData.razor" t="Include" />
             <e p="Index.razor" t="Include" />
+            <e p="LocateConference.razor" t="Include" />
+            <e p="LocateConferenceBase.cs" t="Include" />
           </e>
           <e p="Program.cs" t="Include" />
           <e p="Properties" t="Include">
             <e p="launchSettings.json" t="Include" />
+          </e>
+          <e p="Services" t="Include">
+            <e p="ConferenceAdminService.cs" t="Include" />
+            <e p="IConferenceAdminService.cs" t="Include" />
           </e>
           <e p="Shared" t="Include">
             <e p="MainLayout.razor" t="Include" />
@@ -192,32 +283,10 @@
       <e p="Infrastructure" t="Include">
         <e p="Infrastructure" t="IncludeRecursive">
           <e p="bin" t="ExcludeRecursive" />
-          <e p="EventSourcing" t="Include">
-            <e p="EventSourced.cs" t="Include" />
-            <e p="IEventSourced.cs" t="Include" />
-            <e p="IEventSourcedRepository.cs" t="Include" />
-            <e p="IMementoOriginator.cs" t="Include" />
-            <e p="IVersionedEvent.cs" t="Include" />
-            <e p="VersionedEvent.cs" t="Include" />
-          </e>
+          <e p="EntityNotFoundException.cs" t="Include" />
           <e p="Infrastructure.csproj" t="IncludeRecursive" />
           <e p="Messaging" t="Include">
-            <e p="CommandBusExtensions.cs" t="Include" />
-            <e p="Envelope.cs" t="Include" />
-            <e p="EventBusExtensions.cs" t="Include" />
-            <e p="Handling" t="Include">
-              <e p="EventDispatcher.cs" t="Include" />
-              <e p="ICommandHandler.cs" t="Include" />
-              <e p="ICommandHandlerRegistry.cs" t="Include" />
-              <e p="IEventHandler.cs" t="Include" />
-              <e p="IEventHandlerRegistry.cs" t="Include" />
-            </e>
-            <e p="ICommand.cs" t="Include" />
-            <e p="ICommandBus.cs" t="Include" />
             <e p="IEvent.cs" t="Include" />
-            <e p="IEventBus.cs" t="Include" />
-            <e p="IEventPublisher.cs" t="Include" />
-            <e p="IMessageSessionProvider.cs" t="Include" />
           </e>
           <e p="obj" t="ExcludeRecursive">
             <e p="Debug" t="Include">
@@ -226,27 +295,29 @@
               </e>
             </e>
           </e>
+          <e p="Utils" t="Include">
+            <e p="GuidUtil.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Infrastructure.Sql" t="IncludeRecursive">
+          <e p="Infrastructure.Sql.csproj" t="IncludeRecursive" />
         </e>
       </e>
       <e p="packages" t="ExcludeRecursive" />
       <e p="Payments" t="Include">
         <e p="Payments" t="IncludeRecursive">
-          <e p="bin" t="ExcludeRecursive" />
-          <e p="Class1.cs" t="Include" />
-          <e p="obj" t="ExcludeRecursive">
-            <e p="Debug" t="Include">
-              <e p="netcoreapp3.1" t="Include">
-                <e p="Payments.AssemblyInfo.cs" t="Include" />
-              </e>
-            </e>
-          </e>
           <e p="Payments.csproj" t="IncludeRecursive" />
+        </e>
+        <e p="PaymentsContracts" t="IncludeRecursive">
+          <e p="PaymentsContracts.csproj" t="IncludeRecursive" />
         </e>
       </e>
       <e p="Registration" t="Include">
         <e p="Registration" t="IncludeRecursive">
           <e p="bin" t="ExcludeRecursive" />
-          <e p="Class1.cs" t="Include" />
+          <e p="Handlers" t="Include">
+            <e p="ConferenceViewModelGenerator.cs" t="Include" />
+          </e>
           <e p="obj" t="ExcludeRecursive">
             <e p="Debug" t="Include">
               <e p="netcoreapp3.1" t="Include">
@@ -254,49 +325,19 @@
               </e>
             </e>
           </e>
+          <e p="ReadModel" t="Include">
+            <e p="IConferenceDao.cs" t="Include" />
+            <e p="Implementation" t="Include">
+              <e p="CachingConferenceDao.cs" t="Include" />
+              <e p="ConferenceDao.cs" t="Include" />
+              <e p="ConferenceRegistrationDbContext.cs" t="Include" />
+            </e>
+          </e>
           <e p="Registration.csproj" t="IncludeRecursive" />
         </e>
         <e p="Registration.Contracts" t="IncludeRecursive">
-          <e p="bin" t="ExcludeRecursive" />
-          <e p="Events" t="Include">
-            <e p="OrderConfirmed.cs" t="Include" />
-            <e p="OrderExpired.cs" t="Include" />
-            <e p="OrderPartiallyReserved.cs" t="Include" />
-            <e p="OrderPaymentConfirmed.cs" t="Include" />
-            <e p="OrderPlaced.cs" t="Include" />
-            <e p="OrderRegistrantAssigned.cs" t="Include" />
-            <e p="OrderReservationCompleted.cs" t="Include" />
-            <e p="OrderTotalsCalculated.cs" t="Include" />
-            <e p="OrderUpdated.cs" t="Include" />
-            <e p="SeatAssigned.cs" t="Include" />
-            <e p="SeatAssignmentsCreated.cs" t="Include" />
-            <e p="SeatAssignmentUpdated.cs" t="Include" />
-            <e p="SeatUnassigned.cs" t="Include" />
-          </e>
-          <e p="obj" t="ExcludeRecursive">
-            <e p="Debug" t="Include">
-              <e p="netcoreapp3.1" t="Include">
-                <e p="Registration.Contracts.AssemblyInfo.cs" t="Include" />
-              </e>
-            </e>
-          </e>
-          <e p="OrderLine.cs" t="Include" />
-          <e p="PersonalInfo.cs" t="Include" />
           <e p="Registration.Contracts.csproj" t="IncludeRecursive" />
-          <e p="SeatQuantity.cs" t="Include" />
         </e>
-      </e>
-      <e p="WorkerRoleCommandProcessor" t="IncludeRecursive">
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp3.1" t="Include">
-              <e p="WorkerRoleCommandProcessor.AssemblyInfo.cs" t="Include" />
-            </e>
-          </e>
-        </e>
-        <e p="Program.cs" t="Include" />
-        <e p="WorkerRoleCommandProcessor.csproj" t="IncludeRecursive" />
       </e>
     </e>
   </component>

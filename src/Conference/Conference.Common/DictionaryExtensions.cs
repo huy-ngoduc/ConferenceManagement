@@ -16,7 +16,7 @@ namespace System.Collections.Generic
     /// <summary>
     /// Usability extensions for dictionaries.
     /// </summary>
-    internal static class DictionaryExtensions
+    public static class DictionaryExtensions
     {
         /// <summary>
         /// Gets an item from the dictionary, if it's found.

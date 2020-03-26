@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and limitations under the License.
 // ==============================================================================================================
 
+using Infrastructure.Utils;
+
 namespace Conference
 {
     using System;
@@ -61,7 +63,7 @@ namespace Conference
         public ConferenceInfo()
         {
             this.Id = GuidUtil.NewSequentialId();
-            this.Seats = new ObservableCollection<SeatType>();
+//            this.Seats = new ObservableCollection<SeatType>();
             this.AccessCode = HandleGenerator.Generate(6);
         }
 
@@ -76,17 +78,18 @@ namespace Conference
 
         [Display(Name = "Email")]
         [Required(AllowEmptyStrings = false)]
-        // [RegularExpression(@"[\w-]+(\.?[\w-])*\@[\w-]+(\.[\w-]+)+", ErrorMessageResourceType = typeof(Resources), ErrorMessageResourceName = "InvalidEmail")]
+        
+        // TODO: move the message to resource file
         [RegularExpression(@"[\w-]+(\.?[\w-])*\@[\w-]+(\.[\w-]+)+", ErrorMessage = "The provided email address is not valid.")]
         public string OwnerEmail { get; set; }
 
         [Required(AllowEmptyStrings = false)]
-        // [RegularExpression(@"^\w+$", ErrorMessageResourceType = typeof(Resources), ErrorMessageResourceName = "InvalidSlug")]
+        // TODO: move the message to resource file
         [RegularExpression(@"^\w+$", ErrorMessage = "The slug can only contain alphanumeric characters and underscores.")]
         public string Slug { get; set; }
 
         public bool WasEverPublished { get; set; }
 
-        public virtual ICollection<SeatType> Seats { get; set; }
+//        public virtual ICollection<SeatType> Seats { get; set; }
     }
 }

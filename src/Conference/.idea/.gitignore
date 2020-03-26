@@ -1,2 +1,5 @@
 ﻿# Default ignored files
 /.idea.Conference/.idea/workspace.xml
+# Datasource local storage ignored files
+/.idea.Conference/.idea/dataSources.local.xml
+/.idea.Conference/.idea/dataSources/
