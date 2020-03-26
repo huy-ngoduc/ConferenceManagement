@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UserSecretsId>dotnet-CommandProcessorWorker-4BBF8C15-E7D3-4CF9-8BE6-9498F13962C0</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit" Version="6.2.3" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.3" />
+        <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.2.3" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="6.2.3" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ConferenceManagement\Conference\Conference.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.Sql\Infrastructure.Sql.csproj" />
+      <ProjectReference Include="..\Payments\Payments\Payments.csproj" />
+      <ProjectReference Include="..\Registration\Registration\Registration.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="OrderStateDbContext.cs" />
+      <Compile Remove="OrderStateMap.cs" />
+    </ItemGroup>
+</Project>
